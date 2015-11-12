@@ -11,12 +11,27 @@ router.post('/', function(req, res, next) {
     }
     client.query('INSERT INTO memories(old_days, these_days, year) VALUES($1, $2, $3)',[req.body.data.attributes.old_days, req.body.data.attributes.these_days, req.body.data.attributes.year], function(err, result) {
       done();
-      res.json(req.body);
+      res.status(200).end();
       if (err) {
         return console.error('error running query', err);
       }
     });
   });
 })
+
+router.get('/', function(req, res, next) {
+  pg.connect(conString, function(err, client, done) {
+    if (err) {
+      return console.error('error fetching client from pool', err);
+    }
+    client.query('SELECT * FROM memories', function(err, result) {
+      done();
+      res.send(result.rows);
+      if (err) {
+        return console.error('error running query', err);
+      }
+    });
+  });
+});
 
 module.exports = router;
