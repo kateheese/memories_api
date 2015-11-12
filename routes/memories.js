@@ -26,8 +26,23 @@ router.get('/', function(req, res, next) {
     }
     client.query('SELECT * FROM memories', function(err, result) {
       done();
+      res.send(result.rows);
+      if (err) {
+        return console.error('error running query', err);
+      }
+    });
+  });
+});
+
+router.get('/:year', function(req, res, next) {
+  pg.connect(conString, function(err, client, done) {
+    if (err) {
+      return console.error('error fetching client from pool', err);
+    }
+    client.query('SELECT * FROM memories WHERE year = $1', [req.params.year], function(err, result) {
+      done();
       if(result) {
-        res.send(result.rows);
+        res.send(result.rows[0]);
       } else {
         res.send('No results found')
       }
