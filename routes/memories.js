@@ -26,7 +26,11 @@ router.get('/', function(req, res, next) {
     }
     client.query('SELECT * FROM memories', function(err, result) {
       done();
-      res.send(result);
+      if(result) {
+        res.send(result.rows);
+      } else {
+        res.send('No results found')
+      }
       if (err) {
         return console.error('error running query', err);
       }
