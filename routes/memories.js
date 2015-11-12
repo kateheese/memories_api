@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var pg = require('pg');
-var conString = 'postgres://@localhost/memoriesapp';
+var conString = process.env.DATABASE_URL;
 
 router.post('/', function(req, res, next) {
   pg.connect(conString, function(err, client, done) {
@@ -26,7 +26,7 @@ router.get('/', function(req, res, next) {
     }
     client.query('SELECT * FROM memories', function(err, result) {
       done();
-      res.send(result.rows);
+      res.send(result);
       if (err) {
         return console.error('error running query', err);
       }
