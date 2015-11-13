@@ -34,6 +34,21 @@ router.get('/', function(req, res, next) {
   });
 });
 
+router.get('/years', function(req, res, next) {
+  pg.connect(conString, function(err, client, done) {
+    if (err) {
+      return console.error('error fetching client from pool', err);
+    }
+    client.query('SELECT DISTINCT year FROM memories', function(err, result) {
+      done();
+      res.send(result.rows);
+      if (err) {
+        return console.error('error running query', err);
+      }
+    });
+  });
+});
+
 router.get('/:year', function(req, res, next) {
   pg.connect(conString, function(err, client, done) {
     if (err) {
