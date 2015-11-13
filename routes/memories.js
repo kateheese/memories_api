@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var formatter = require('../lib/formatter.js');
 var pg = require('pg');
 var conString = process.env.DATABASE_URL || 'postgres://@localhost/memoriesapp';
 
@@ -26,7 +27,8 @@ router.get('/', function(req, res, next) {
     }
     client.query('SELECT * FROM memories', function(err, result) {
       done();
-      res.send(result.rows);
+      var url = req.get('host') + req.originalUrl;
+      res.status(200).json(formatter.dataFormat(result.rows, url));
       if (err) {
         return console.error('error running query', err);
       }
@@ -41,7 +43,8 @@ router.get('/years', function(req, res, next) {
     }
     client.query('SELECT DISTINCT year FROM memories', function(err, result) {
       done();
-      res.send(result.rows);
+      var url = req.get('host') + req.originalUrl;
+      res.status(200).json(formatter.yearFormat(result.rows, url));
       if (err) {
         return console.error('error running query', err);
       }
@@ -56,11 +59,8 @@ router.get('/:year', function(req, res, next) {
     }
     client.query('SELECT * FROM memories WHERE year = $1', [req.params.year], function(err, result) {
       done();
-      if(result) {
-        res.send(result.rows[0]);
-      } else {
-        res.send('No results found')
-      }
+      var url = req.get('host') + req.originalUrl;
+      res.status(200).json(formatter.dataFormat(result.rows, url));
       if (err) {
         return console.error('error running query', err);
       }
